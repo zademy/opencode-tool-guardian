@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { canonicalize, isWithin, normalizePath } from "../../src/core/canonicalize.js";
+import { homedir } from "node:os";
 
 describe("canonicalize", () => {
   test("is stable across reordered JSON keys", () => {
@@ -25,23 +26,31 @@ describe("canonicalize", () => {
 });
 
 describe("normalizePath", () => {
+  // "/tmp" is drive-relative on Windows (it resolves against the current drive), so
+  // tests that need an absolute cwd must build one for the host they run on.
+  const isWindows = process.platform === "win32";
+  const ROOT = isWindows ? "C:\\tg" : "/tmp/tg";
+  const PREFIX = normalizePath(ROOT);
+
   test("resolves relative paths against cwd and collapses traversal", () => {
-    const cwd = "/tmp/project";
-    expect(normalizePath("src/index.ts", cwd)).toBe("/tmp/project/src/index.ts");
-    expect(normalizePath("./src/../src/index.ts", cwd)).toBe("/tmp/project/src/index.ts");
-    expect(normalizePath("../sibling/file.ts", cwd)).toBe("/tmp/sibling/file.ts");
+    expect(normalizePath("src/index.ts", ROOT)).toBe(PREFIX + "/src/index.ts");
+    expect(normalizePath("./src/../src/index.ts", ROOT)).toBe(PREFIX + "/src/index.ts");
+    expect(normalizePath("../sibling/file.ts", ROOT)).toBe(normalizePath(PREFIX + "/..") + "/sibling/file.ts");
   });
 
   test("expands a leading tilde", () => {
-    const home = process.env.HOME ?? process.env.USERPROFILE ?? "";
-    if (home.length > 0) expect(normalizePath("~/.ssh/config")).toBe(home + "/.ssh/config");
+    const home = homedir();
+    // The expectation goes through normalizePath too: on Windows the home directory
+    // arrives with native separators and must normalize exactly like the input does.
+    if (home.length > 0) expect(normalizePath("~/.ssh/config")).toBe(normalizePath(home) + "/.ssh/config");
   });
 
   test("handles paths containing spaces", () => {
-    expect(normalizePath("my project/a b.txt", "/tmp")).toBe("/tmp/my project/a b.txt");
+    expect(normalizePath("my project/a b.txt", ROOT)).toBe(PREFIX + "/my project/a b.txt");
   });
 
   test("POSIX shapes", () => {
+    if (isWindows) return; // POSIX-native semantics: on Windows a backslash is a separator.
     expect(normalizePath("/Users/me/a.txt")).toBe("/Users/me/a.txt");
     // Backslash is a legal filename character on POSIX and must not become a separator.
     expect(normalizePath("/tmp/a\\b.txt")).toBe("/tmp/a\\b.txt");
