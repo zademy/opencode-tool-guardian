@@ -72,5 +72,5 @@ Primera version funcional del MVP. Verificada contra OpenCode **2.0.26**.
 - Cache de resultados y reescritura de argumentos (ver README, seccion
   "Capacidades no implementadas").
 
-[0.2.0]: https://example.invalid/opencode-tool-guardian/releases/tag/v0.2.0
-[0.1.0]: https://example.invalid/opencode-tool-guardian/releases/tag/v0.1.0
+[0.2.0]: https://github.com/zademy/opencode-tool-guardian/releases/tag/v0.2.0
+[0.1.0]: https://github.com/zademy/opencode-tool-guardian/releases/tag/v0.1.0

@@ -307,8 +307,6 @@ ultimo token.
 
 ### Lo que sigue sin verificarse
 
-- La suite de CI esta configurada pero **aun no se ha ejecutado**: este repositorio
-  no tiene remoto. Nada de lo de arriba vale como prueba de Windows hasta que corra.
   Los workflows son `tests.yml` (matriz ubuntu/macos/windows: tipos, tests y build) y
   `release.yml` (GitHub release tras un push verde a main, saltandose si el tag ya
   existe), siguiendo el esquema de los de Context Mode.

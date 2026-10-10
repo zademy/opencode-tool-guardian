@@ -40,5 +40,12 @@
   },
   "engines": {
     "opencode": ">=2.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zademy/opencode-tool-guardian.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zademy/opencode-tool-guardian/issues"
   }
 }

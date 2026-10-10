@@ -1,7 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { analyzeCommand } from "../../src/core/detector-risk.js";
 
-const ctx = { workspace: "/w/project", cwd: "/w/project" };
+// A POSIX-style "/w/project" is drive-relative on Windows: normalizePath keeps it
+// without a drive, but using it as a cwd makes win32.resolve prepend the active
+// drive, and the two forms stop matching. Real sessions always pass a host-native
+// path (ctx.location gives one), so the fixture must too.
+const ROOT = process.platform === "win32" ? "C:\\w\\project" : "/w/project";
+const ctx = { workspace: ROOT, cwd: ROOT };
 const rules = (command: string) => analyzeCommand(command, ctx).map((f) => f.rule);
 
 describe("command risk analyzer", () => {
@@ -18,12 +23,13 @@ describe("command risk analyzer", () => {
   });
 
   test("rm without force or without recursive is not a destructive delete", () => {
-    expect(rules("rm /tmp/x")).not.toContain("risk.rm-destructive");
+    expect(rules("rm somewhere/x")).not.toContain("risk.rm-destructive");
     expect(rules("rm -rf build/")).not.toContain("risk.rm-destructive");
   });
 
   test("paths outside the workspace warn but do not block", () => {
-    const found = analyzeCommand("cat /etc/hosts", ctx);
+    const outside = process.platform === "win32" ? "D:\\etc\\hosts" : "/etc/hosts";
+    const found = analyzeCommand("cat " + outside, ctx);
     expect(found.map((f) => f.rule)).toContain("risk.outside-workspace");
     expect(found.every((f) => f.severity !== "block")).toBe(true);
   });

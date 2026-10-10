@@ -35,7 +35,9 @@ describe("normalizePath", () => {
   test("resolves relative paths against cwd and collapses traversal", () => {
     expect(normalizePath("src/index.ts", ROOT)).toBe(PREFIX + "/src/index.ts");
     expect(normalizePath("./src/../src/index.ts", ROOT)).toBe(PREFIX + "/src/index.ts");
-    expect(normalizePath("../sibling/file.ts", ROOT)).toBe(normalizePath(PREFIX + "/..") + "/sibling/file.ts");
+    // La expectativa pasa por normalizePath para no duplicar las reglas de colapso:
+    // en Windows "c:/tg/.." colapsa a "c:/" y concatenar a mano daria "c://".
+    expect(normalizePath("../sibling/file.ts", ROOT)).toBe(normalizePath(ROOT + "/../sibling/file.ts"));
   });
 
   test("expands a leading tilde", () => {
