@@ -346,8 +346,7 @@ npm publish --access public
 ~~~
 
 `files` en `package.json` publica solo `dist`, la licencia y la documentacion.
-No hay repositorio remoto configurado: añade uno antes de publicar si quieres que la
-pagina del paquete enlace al codigo.
+Repositorio: https://github.com/zademy/opencode-tool-guardian.
 
 ---
 

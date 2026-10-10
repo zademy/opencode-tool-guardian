@@ -157,7 +157,16 @@ for (const shell of SHELL_BINARIES) {
     }
   }
 
-  for (const target of args.filter((a) => !a.startsWith("-") && (a.includes("/") || a.startsWith("~")))) {
+  // A Windows argument carries backslashes, not slashes: without this branch every
+  // native path on Windows is invisible to the outside-workspace and sensitive
+  // path checks. On POSIX a drive letter or UNC prefix still deserves path
+  // treatment, but a bare backslash stays a filename character there.
+  const looksLikePath = (a: string): boolean =>
+    a.includes("/") ||
+    a.startsWith("~") ||
+    (process.platform === "win32" ? a.includes("\\") : /^[A-Za-z]:[\\/]/.test(a) || a.startsWith("\\\\"));
+
+  for (const target of args.filter((a) => !a.startsWith("-") && looksLikePath(a))) {
     const path = absolute(target);
     if (!isWithin(context.workspace, path)) {
       findings.push({

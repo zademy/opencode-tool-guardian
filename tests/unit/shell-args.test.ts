@@ -6,9 +6,16 @@ describe("tokenize", () => {
     expect(tokenize('echo "rm -rf /"')).toEqual(["echo", "rm -rf /"]);
   });
 
-  test("handles single quotes and escapes", () => {
+  test("handles single quotes and POSIX escapes of metacharacters", () => {
     expect(tokenize("echo 'a b'")).toEqual(["echo", "a b"]);
+    // Un espacio escapado sigue siendo un escape de verdad.
     expect(tokenize("echo a\\ b")).toEqual(["echo", "a b"]);
+  });
+
+  test("keeps backslashes literal outside metacharacters", () => {
+    // En Windows la barra invertida separa rutas: comersela convertia
+    // D:\etc en D:etc y volvia invisibles las rutas nativas.
+    expect(tokenize("cat D:\\etc\\hosts")).toEqual(["cat", "D:\\etc\\hosts"]);
   });
 });
 

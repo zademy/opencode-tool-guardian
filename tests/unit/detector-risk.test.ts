@@ -35,7 +35,14 @@ describe("command risk analyzer", () => {
   });
 
   test("sensitive paths inside the workspace warn", () => {
-    expect(rules("cat /w/project/.ssh/config")).toContain("risk.sensitive-path");
+    expect(rules("cat " + ROOT + "/.ssh/config")).toContain("risk.sensitive-path");
+  });
+
+  test("a native Windows path with backslashes is still a path", () => {
+    // La CI en windows-latest encontro que un argumento con solo barras invertidas
+    // no se consideraba ruta y las reglas de alcance no se evaluaban.
+    if (process.platform !== "win32") return;
+    expect(rules("type C:\\Windows\\win.ini")).toContain("risk.outside-workspace");
   });
 
   test("remote code execution through a pipe warns", () => {

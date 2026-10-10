@@ -43,6 +43,9 @@ export function splitSegments(command: string): string[] {
 }
 
 /** Splits a segment into argv tokens, honouring single/double quotes and backslash escapes. */
+// Only these lose their meaning when preceded by a backslash in POSIX shells.
+const ESCAPED_BY_BACKSLASH = /[\\ "'`$&|;<>(){}!]/;
+
 export function tokenize(segment: string): string[] {
   const tokens: string[] = [];
   let current = "";
@@ -55,8 +58,11 @@ export function tokenize(segment: string): string[] {
       else current += char;
       continue;
     }
-    // Single quotes were handled above, so a backslash here is always an escape.
-    if (char === "\\" && i + 1 < segment.length) {
+    // A backslash only escapes POSIX shell metacharacters. Everywhere else it stays
+    // literal: on Windows it is the path separator, and eating it turned
+    // "D:\etc\hosts" into "D:etchosts", which made every native path
+    // invisible to the risk and scope rules.
+    if (char === "\\" && i + 1 < segment.length && ESCAPED_BY_BACKSLASH.test(segment[i + 1]!)) {
       current += segment[i + 1]!;
       i += 1;
       started = true;
