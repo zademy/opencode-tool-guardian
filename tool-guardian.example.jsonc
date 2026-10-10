@@ -1,0 +1,51 @@
+// Configuracion de ejemplo para opencode-tool-guardian.
+//
+// No forma parte de opencode.json: es un archivo propio del plugin.
+// Se busca desde el directorio del proyecto hacia arriba y despues en
+// ~/.config/opencode/. Copia este archivo como "tool-guardian.jsonc".
+{
+  "enabled": true,
+
+  // observe = solo mide. warn = escala avisos. enforce = bloquea reglas listadas.
+  "mode": "observe",
+
+  "detectors": {
+    "duplicates": true,
+    "repeatedFailures": true,
+    "commandRisk": true,
+    "excessiveSearch": true,
+    "outputCost": true
+  },
+
+  "thresholds": {
+    "repeatedFailureCount": 3,
+    "largeOutputLines": 1500,
+    "maxTrackedOperations": 2000
+  },
+
+  "privacy": {
+    "storeRawToolOutput": false,
+    "storeFullCommands": false,
+    "redactSecrets": true
+  },
+
+  // Sin mecanismo oficial para devolver un resultado sin ejecutar la
+  // herramienta. Se mantiene para explicitar que la cache esta apagada.
+  "cache": {
+    "enabled": false
+  },
+
+  "rewrites": {
+    "enabled": false
+  },
+
+  // Vacio = nada se bloquea nunca. Anade reglas una a una y probalas.
+  // Reglas con severidad "block": risk.rm-destructive, risk.disk-write,
+  // risk.permissions-broad, risk.fork-bomb.
+  "policy": {
+    "blockRules": []
+  },
+
+  "excludedTools": [],
+  "excludedPaths": [".git/**", "node_modules/**", "target/**", "dist/**", "build/**"]
+}

@@ -1,0 +1,7 @@
+# El analizador de comandos parte lineas de texto: CRLF meteria un \r
+# phantom en el ultimo token. Fijamos LF en el repositorio.
+* text=auto eol=lf
+
+dist/** text eol=lf
+*.jsonc text eol=lf
+*.md text eol=lf

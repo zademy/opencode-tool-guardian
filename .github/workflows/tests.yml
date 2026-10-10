@@ -1,0 +1,33 @@
+name: Tests
+
+# La comprobacion de rutas depende del sabor del sistema (posix frente a win32), asi
+# que la suite tiene que correr en los tres. normalizePath aplica reglas de Windows a
+# rutas con letra de unidad aunque corra en POSIX, pero eso no sustituye a ejecutar la
+# suite real sobre Windows.
+on: [push, pull_request]
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Instalar dependencias
+        run: bun install --frozen-lockfile
+
+      - name: Comprobar tipos
+        run: bun run typecheck
+
+      - name: Ejecutar tests
+        run: bun test
+
+      - name: Compilar
+        run: bun run build

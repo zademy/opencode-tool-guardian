@@ -1,0 +1,44 @@
+{
+  "name": "opencode-tool-guardian",
+  "version": "0.2.0",
+  "description": "Deterministic, local-first observer for OpenCode V2 tool calls: duplicates, failure loops, command risk, excessive search and output cost. No LLM calls.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "tool-guardian.example.jsonc"
+  ],
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "observability",
+    "guardrails"
+  ],
+  "scripts": {
+    "build": "bun run src/build.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "test:unit": "bun test tests/unit",
+    "test:integration": "bun test tests/integration",
+    "check": "bun run typecheck && bun test && bun run build"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.0",
+    "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "jsonc-parser": "^3.3.1",
+    "zod": "^3.24.1"
+  },
+  "engines": {
+    "opencode": ">=2.0.0"
+  }
+}
